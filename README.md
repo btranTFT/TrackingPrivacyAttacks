@@ -83,7 +83,7 @@ python membership_inference_attack.py
 python analyze_results.py
 ```
 
-## Key Results (From Progress Report)
+## Key Results
 
 ### Privacy Leakage
 - **41%** of sessions resulted in potential privacy leakage
@@ -105,6 +105,10 @@ python analyze_results.py
 - `healthcare_portal.db` - Portal data
 - `tracker_data.db` - Tracking events  
 - `analysis_results.json` - Results
+
+## Status
+
+⚠️ **Work in Progress** - This project is under active development for CS 5510 Final Project.
 
 ## Notes
 
