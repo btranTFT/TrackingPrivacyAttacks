@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HealthCare Portal{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .header nav a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+        
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3c3;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 HealthCare Portal</h1>
+            <nav>
+                {% if session.user_id %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('search') }}">Search</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+        
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    
+    <!-- Embedded Tracker Script - Simulates third-party analytics -->
+    <script>
+        // Tracker configuration
+        const TRACKER_ENDPOINT = 'http://localhost:3000/track';
+        const TRACKER_ID = 'healthcare-tracker-v1';
+        
+        // Generate or retrieve session ID
+        function getTrackerSessionId() {
+            let sessionId = sessionStorage.getItem('tracker_session_id');
+            if (!sessionId) {
+                sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                sessionStorage.setItem('tracker_session_id', sessionId);
+            }
+            return sessionId;
+        }
+        
+        // Send tracking event
+        function sendTrackingEvent(eventType, eventData) {
+            const trackingPayload = {
+                tracker_id: TRACKER_ID,
+                session_id: getTrackerSessionId(),
+                timestamp: new Date().toISOString(),
+                event_type: eventType,
+                page_url: window.location.href,
+                page_title: document.title,
+                referrer: document.referrer,
+                user_agent: navigator.userAgent,
+                screen_resolution: screen.width + 'x' + screen.height,
+                ...eventData
+            };
+            
+            // Send to tracking server
+            fetch(TRACKER_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(trackingPayload),
+                mode: 'no-cors' // Simulates cross-origin tracking
+            }).catch(err => {
+                console.log('Tracking event sent (no-cors mode)');
+            });
+            
+            console.log('Tracker Event:', trackingPayload);
+        }
+        
+        // Track page view
+        window.addEventListener('load', function() {
+            sendTrackingEvent('page_view', {
+                load_time: performance.timing.loadEventEnd - performance.timing.navigationStart
+            });
+        });
+        
+        // Track clicks
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+            const tagName = target.tagName.toLowerCase();
+            
+            if (tagName === 'a' || tagName === 'button') {
+                sendTrackingEvent('click', {
+                    element_type: tagName,
+                    element_text: target.textContent.trim(),
+                    element_id: target.id || null,
+                    element_class: target.className || null,
+                    target_url: target.href || null
+                });
+            }
+        });
+        
+        // Track form submissions
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            const formData = new FormData(form);
+            const formFields = {};
+            
+            for (let [key, value] of formData.entries()) {
+                // Capture field names but mask sensitive values
+                if (key.toLowerCase().includes('password')) {
+                    formFields[key] = '[MASKED]';
+                } else {
+                    formFields[key] = value;
+                }
+            }
+            
+            sendTrackingEvent('form_submit', {
+                form_action: form.action,
+                form_method: form.method,
+                form_fields: formFields
+            });
+        });
+        
+        // Track search queries (if search input exists)
+        const searchInputs = document.querySelectorAll('input[type="search"], input[name="q"]');
+        searchInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                sendTrackingEvent('search', {
+                    query: this.value
+                });
+            });
+        });
+        
+        // Track time on page
+        let pageStartTime = Date.now();
+        window.addEventListener('beforeunload', function() {
+            const timeOnPage = Math.round((Date.now() - pageStartTime) / 1000);
+            sendTrackingEvent('page_exit', {
+                time_on_page_seconds: timeOnPage
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

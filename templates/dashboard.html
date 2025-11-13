@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - HealthCare Portal{% endblock %}
+
+{% block content %}
+<h2 style="color: #333; margin-bottom: 30px;">Welcome, {{ username }}!</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px;">
+    <div style="padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
+        <h3 style="margin-bottom: 15px;">🔍 Search Health Topics</h3>
+        <p style="margin-bottom: 20px; opacity: 0.9;">Find information about conditions, treatments, and services</p>
+        <a href="{{ url_for('search') }}" class="btn" style="background: white; color: #667eea;">Go to Search</a>
+    </div>
+    
+    <div style="padding: 30px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; color: white;">
+        <h3 style="margin-bottom: 15px;">📋 My Records</h3>
+        <p style="margin-bottom: 20px; opacity: 0.9;">View your medical history and test results</p>
+        <button class="btn" style="background: white; color: #f5576c;" onclick="alert('Feature coming soon!')">View Records</button>
+    </div>
+    
+    <div style="padding: 30px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 10px; color: white;">
+        <h3 style="margin-bottom: 15px;">📅 Appointments</h3>
+        <p style="margin-bottom: 20px; opacity: 0.9;">Schedule and manage your appointments</p>
+        <button class="btn" style="background: white; color: #4facfe;" onclick="alert('Feature coming soon!')">Book Appointment</button>
+    </div>
+</div>
+
+<div style="background: #f8f9fa; padding: 30px; border-radius: 10px;">
+    <h3 style="color: #333; margin-bottom: 20px;">Quick Links to Health Topics</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <a href="{{ url_for('topic_page', topic_name='cardiology') }}" class="btn" style="background: #667eea;">Cardiology</a>
+        <a href="{{ url_for('topic_page', topic_name='oncology') }}" class="btn" style="background: #764ba2;">Oncology</a>
+        <a href="{{ url_for('topic_page', topic_name='mental-health') }}" class="btn" style="background: #f093fb;">Mental Health</a>
+        <a href="{{ url_for('topic_page', topic_name='diabetes') }}" class="btn" style="background: #4facfe;">Diabetes</a>
+        <a href="{{ url_for('topic_page', topic_name='hiv') }}" class="btn" style="background: #f5576c;">HIV Services</a>
+    </div>
+</div>
+{% endblock %}
+

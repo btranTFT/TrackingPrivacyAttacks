@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ info.title }} - HealthCare Portal{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <a href="{{ url_for('search') }}" style="color: #667eea; text-decoration: none; display: inline-block; margin-bottom: 20px;">
+        ← Back to Search
+    </a>
+    
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 10px; color: white; margin-bottom: 30px;">
+        <h2 style="margin-bottom: 15px;">{{ info.title }}</h2>
+        <p style="font-size: 18px; opacity: 0.95;">{{ info.description }}</p>
+    </div>
+    
+    <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+        <h3 style="color: #333; margin-bottom: 20px;">Available Services</h3>
+        <ul style="list-style: none; padding: 0;">
+            {% for service in info.services %}
+            <li style="padding: 15px; background: white; margin-bottom: 10px; border-radius: 5px; border-left: 4px solid #667eea;">
+                ✓ {{ service }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div style="background: #fff3cd; padding: 25px; border-radius: 10px; border-left: 4px solid #ffc107; margin-bottom: 30px;">
+        <h4 style="color: #856404; margin-bottom: 10px;">📞 Need to Schedule an Appointment?</h4>
+        <p style="color: #856404; margin-bottom: 15px;">Contact our scheduling team to book a consultation with a specialist.</p>
+        <button class="btn" style="background: #ffc107; color: #333;" onclick="alert('Scheduling feature coming soon!')">
+            Schedule Appointment
+        </button>
+    </div>
+    
+    <div style="padding: 25px; background: white; border: 2px solid #e0e0e0; border-radius: 10px;">
+        <h4 style="color: #333; margin-bottom: 15px;">Related Topics</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('topic_page', topic_name='cardiology') }}" class="btn" style="font-size: 14px; padding: 8px 16px;">Cardiology</a>
+            <a href="{{ url_for('topic_page', topic_name='oncology') }}" class="btn" style="font-size: 14px; padding: 8px 16px;">Oncology</a>
+            <a href="{{ url_for('topic_page', topic_name='mental-health') }}" class="btn" style="font-size: 14px; padding: 8px 16px;">Mental Health</a>
+            <a href="{{ url_for('topic_page', topic_name='diabetes') }}" class="btn" style="font-size: 14px; padding: 8px 16px;">Diabetes</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
