@@ -6,6 +6,8 @@ Team: Nicholas Ramirez-Ornelas, Kai Xue, Benjamin Tran, Andrew Tarng
 
 ## Overview
 
+**Work in Progress** - This project is under active development for CS 5510 Final Project.
+
 This project demonstrates privacy leakage in healthcare web portals through tracking scripts, implements membership inference attacks, and evaluates differential privacy defenses. Replicates findings similar to the 2024 Kaiser Permanente incident.
 
 ## Quick Start
@@ -39,8 +41,8 @@ python app.py
 - **Flask Healthcare Portal** - Login, search, session tracking  
 - **JavaScript Trackers** - Embedded tracking scripts  
 - **Node.js Tracking Server** - Event logging to SQLite  
-- **500 Synthetic Sessions** - ~41% with sensitive leakage  
-- **Membership Inference Attack** - ~78% accuracy baseline  
+- **Synthetic Session Simulator** - Generates user sessions with varied behavior
+- **Membership Inference Attack** - ML-based attack model
 - **Privacy Defenses** - CSP headers, sanitization, differential privacy  
 - **Analysis Tools** - Leakage metrics, attack evaluation
 
@@ -105,10 +107,6 @@ python analyze_results.py
 - `healthcare_portal.db` - Portal data
 - `tracker_data.db` - Tracking events  
 - `analysis_results.json` - Results
-
-## Status
-
-**Work in Progress** - This project is under active development for CS 5510 Final Project.
 
 ## Notes
 
