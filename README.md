@@ -36,13 +36,13 @@ python app.py
 
 ## What's Implemented
 
-✅ **Flask Healthcare Portal** - Login, search, session tracking  
-✅ **JavaScript Trackers** - Embedded tracking scripts  
-✅ **Node.js Tracking Server** - Event logging to SQLite  
-✅ **500 Synthetic Sessions** - ~41% with sensitive leakage  
-✅ **Membership Inference Attack** - ~78% accuracy baseline  
-✅ **Privacy Defenses** - CSP headers, sanitization, differential privacy  
-✅ **Analysis Tools** - Leakage metrics, attack evaluation
+- **Flask Healthcare Portal** - Login, search, session tracking  
+- **JavaScript Trackers** - Embedded tracking scripts  
+- **Node.js Tracking Server** - Event logging to SQLite  
+- **500 Synthetic Sessions** - ~41% with sensitive leakage  
+- **Membership Inference Attack** - ~78% accuracy baseline  
+- **Privacy Defenses** - CSP headers, sanitization, differential privacy  
+- **Analysis Tools** - Leakage metrics, attack evaluation
 
 ## Project Structure
 
@@ -108,7 +108,7 @@ python analyze_results.py
 
 ## Status
 
-⚠️ **Work in Progress** - This project is under active development for CS 5510 Final Project.
+**Work in Progress** - This project is under active development for CS 5510 Final Project.
 
 ## Notes
 
