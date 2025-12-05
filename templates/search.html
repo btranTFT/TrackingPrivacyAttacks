@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Search - HealthCare Portal{% endblock %}
+
+{% block content %}
+<h2 style="color: #333; margin-bottom: 30px;">Search Health Topics</h2>
+
+<form method="GET" action="{{ url_for('search') }}" style="margin-bottom: 40px;">
+    <div style="display: flex; gap: 10px;">
+        <input type="search" 
+               name="q" 
+               value="{{ query }}" 
+               placeholder="Search for conditions, treatments, or services..." 
+               style="flex: 1; padding: 15px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 16px;">
+        <button type="submit" class="btn">Search</button>
+    </div>
+</form>
+
+{% if query %}
+    <h3 style="color: #333; margin-bottom: 20px;">Search Results for "{{ query }}"</h3>
+    
+    {% if results %}
+        <div style="display: grid; gap: 20px;">
+            {% for result in results %}
+            <div style="padding: 25px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #667eea;">
+                <h4 style="color: #333; margin-bottom: 10px;">{{ result.name.title() }}</h4>
+                <p style="color: #666; margin-bottom: 15px;">{{ result.description }}</p>
+                <a href="{{ url_for('topic_page', topic_name=result.name) }}" class="btn">Learn More</a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 10px;">
+            <p style="color: #666; font-size: 18px;">No results found for "{{ query }}"</p>
+            <p style="color: #999; margin-top: 10px;">Try searching for: oncology, cardiology, mental health, HIV, diabetes</p>
+        </div>
+    {% endif %}
+{% else %}
+    <div style="background: #f8f9fa; padding: 30px; border-radius: 10px;">
+        <h3 style="color: #333; margin-bottom: 20px;">Popular Health Topics</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div style="padding: 20px; background: white; border-radius: 8px;">
+                <h4 style="color: #667eea; margin-bottom: 10px;">Cardiology</h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Heart health and cardiovascular care</p>
+                <a href="{{ url_for('search') }}?q=cardiology" class="btn" style="font-size: 14px; padding: 8px 16px;">Search</a>
+            </div>
+            
+            <div style="padding: 20px; background: white; border-radius: 8px;">
+                <h4 style="color: #764ba2; margin-bottom: 10px;">Oncology</h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Cancer treatment and care</p>
+                <a href="{{ url_for('search') }}?q=oncology" class="btn" style="font-size: 14px; padding: 8px 16px;">Search</a>
+            </div>
+            
+            <div style="padding: 20px; background: white; border-radius: 8px;">
+                <h4 style="color: #f093fb; margin-bottom: 10px;">Mental Health</h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Counseling and psychiatric services</p>
+                <a href="{{ url_for('search') }}?q=mental health" class="btn" style="font-size: 14px; padding: 8px 16px;">Search</a>
+            </div>
+            
+            <div style="padding: 20px; background: white; border-radius: 8px;">
+                <h4 style="color: #4facfe; margin-bottom: 10px;">Diabetes</h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Diabetes management and care</p>
+                <a href="{{ url_for('search') }}?q=diabetes" class="btn" style="font-size: 14px; padding: 8px 16px;">Search</a>
+            </div>
+            
+            <div style="padding: 20px; background: white; border-radius: 8px;">
+                <h4 style="color: #f5576c; margin-bottom: 10px;">HIV Services</h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">HIV testing and treatment</p>
+                <a href="{{ url_for('search') }}?q=hiv" class="btn" style="font-size: 14px; padding: 8px 16px;">Search</a>
+            </div>
+            
+            <div style="padding: 20px; background: white; border-radius: 8px;">
+                <h4 style="color: #667eea; margin-bottom: 10px;">Neurology</h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Brain and nervous system care</p>
+                <a href="{{ url_for('search') }}?q=neurology" class="btn" style="font-size: 14px; padding: 8px 16px;">Search</a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Home - HealthCare Portal{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 40px 0;">
+    <h2 style="color: #333; margin-bottom: 20px; font-size: 32px;">Welcome to HealthCare Portal</h2>
+    <p style="color: #666; font-size: 18px; margin-bottom: 40px;">Your trusted partner in health information and services</p>
+    
+    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('login') }}" class="btn">Login</a>
+        <a href="{{ url_for('register') }}" class="btn">Register</a>
+    </div>
+    
+    <div style="margin-top: 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+        <div style="padding: 30px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">🔍 Search Health Topics</h3>
+            <p style="color: #666;">Find information about various health conditions and treatments</p>
+        </div>
+        
+        <div style="padding: 30px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">📋 Medical Records</h3>
+            <p style="color: #666;">Access your medical history and test results</p>
+        </div>
+        
+        <div style="padding: 30px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">📅 Appointments</h3>
+            <p style="color: #666;">Schedule and manage your healthcare appointments</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

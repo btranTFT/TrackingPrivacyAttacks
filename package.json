@@ -1,0 +1,28 @@
+{
+  "name": "healthcare-tracker-server",
+  "version": "1.0.0",
+  "description": "Tracking server for healthcare portal privacy research",
+  "main": "tracker_server.js",
+  "scripts": {
+    "start": "node tracker_server.js",
+    "dev": "nodemon tracker_server.js"
+  },
+  "keywords": [
+    "privacy",
+    "tracking",
+    "healthcare",
+    "research"
+  ],
+  "author": "CS5510 Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+

@@ -1,0 +1,45 @@
+================================================================================
+TRACKING THE TRACKERS: Privacy Attacks and Defenses in Healthcare Web Systems
+CS 5510 Final Project - Progress Report Implementation
+================================================================================
+
+TEAM: Nicholas Ramirez-Ornelas, Kai Xue, Benjamin Tran, Andrew Tarng
+
+QUICK START:
+  1. pip install -r requirements.txt && npm install
+  2. python run_experiment.py
+  3. Check analysis_results.json
+
+WHAT'S INCLUDED:
+  ✓ Flask healthcare portal with tracking
+  ✓ Node.js tracking server
+  ✓ 500 synthetic user sessions (~41% leakage)
+  ✓ Membership inference attack (~78% accuracy)
+  ✓ Privacy defenses (CSP, sanitization, DP)
+  ✓ Analysis tools
+
+KEY FILES:
+  app.py                          - Healthcare portal (Flask)
+  tracker_server.js              - Tracking server (Node.js)
+  simulate_sessions.py           - Generate 500 sessions
+  membership_inference_attack.py - Attack implementation
+  privacy_defenses.py            - Defense mechanisms
+  differential_privacy.py        - DP with Laplace noise
+  analyze_results.py             - Comprehensive analysis
+  run_experiment.py              - Run everything
+  templates/                     - HTML with embedded trackers
+
+EXPECTED RESULTS:
+  - Leakage Rate: ~41%
+  - Attack Accuracy (baseline): ~78%
+  - Attack Reduction (DP ε=1.0): 12-15%
+
+DATABASES CREATED:
+  - healthcare_portal.db (portal data)
+  - tracker_data.db (tracking events)
+
+STATUS: Progress report milestone complete (Nov 12, 2025)
+
+See README.md for full documentation.
+================================================================================
+
