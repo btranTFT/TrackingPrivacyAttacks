@@ -56,12 +56,14 @@ SEARCH_QUERIES = {
 }
 
 class SessionSimulator:
-    def __init__(self, db_path='healthcare_portal.db'):
+    def __init__(self, db_path='healthcare_portal.db', tracker_db_path='tracker_data.db'):
         self.db_path = db_path
+        self.tracker_db_path = tracker_db_path
         self.users = []
         
     def init_database(self):
         """Ensure database tables exist"""
+        # Initialize portal database
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         
@@ -109,7 +111,46 @@ class SessionSimulator:
         
         conn.commit()
         conn.close()
-        print("[OK] Database initialized")
+        
+        # Initialize tracker database
+        tracker_conn = sqlite3.connect(self.tracker_db_path)
+        tracker_c = tracker_conn.cursor()
+        
+        # Tracking events table
+        tracker_c.execute('''CREATE TABLE IF NOT EXISTS tracking_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tracker_id TEXT,
+            session_id TEXT,
+            timestamp TEXT,
+            event_type TEXT,
+            page_url TEXT,
+            page_title TEXT,
+            referrer TEXT,
+            user_agent TEXT,
+            screen_resolution TEXT,
+            event_data TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        
+        # Leakage analysis table
+        tracker_c.execute('''CREATE TABLE IF NOT EXISTS leakage_analysis (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT,
+            has_sensitive_leak INTEGER DEFAULT 0,
+            sensitive_terms TEXT,
+            leak_type TEXT,
+            analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        
+        # Create indexes
+        tracker_c.execute('''CREATE INDEX IF NOT EXISTS idx_session_id ON tracking_events(session_id)''')
+        tracker_c.execute('''CREATE INDEX IF NOT EXISTS idx_event_type ON tracking_events(event_type)''')
+        tracker_c.execute('''CREATE INDEX IF NOT EXISTS idx_timestamp ON tracking_events(timestamp)''')
+        
+        tracker_conn.commit()
+        tracker_conn.close()
+        
+        print("[OK] Databases initialized")
     
     def hash_password(self, password):
         """Hash password"""
@@ -173,6 +214,36 @@ class SessionSimulator:
         """Generate random session ID"""
         return f"session_{random.randint(100000, 999999)}_{int(time.time())}"
     
+    def create_tracking_event(self, session_id, event_type, page_url, page_title, timestamp, query=None):
+        """Create a tracking event in the tracker database"""
+        tracker_conn = sqlite3.connect(self.tracker_db_path)
+        tracker_c = tracker_conn.cursor()
+        
+        # Generate tracker ID
+        tracker_id = f"tracker_{random.randint(1000, 9999)}"
+        
+        # Create event data
+        event_data = {
+            'event_type': event_type,
+            'page_url': page_url,
+            'page_title': page_title,
+            'time_on_page_seconds': random.randint(5, 120)
+        }
+        
+        if query:
+            event_data['query'] = query
+        
+        # Insert tracking event
+        tracker_c.execute('''INSERT INTO tracking_events 
+                           (tracker_id, session_id, timestamp, event_type, page_url, page_title, 
+                            referrer, user_agent, screen_resolution, event_data)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                         (tracker_id, session_id, timestamp.isoformat(), event_type, page_url, page_title,
+                          '', 'Mozilla/5.0 (simulated)', '1920x1080', json.dumps(event_data)))
+        
+        tracker_conn.commit()
+        tracker_conn.close()
+    
     def simulate_session(self, user, session_num):
         """Simulate a single user session"""
         conn = sqlite3.connect(self.db_path)
@@ -204,6 +275,7 @@ class SessionSimulator:
         c.execute('''INSERT INTO page_visits (user_id, session_id, page_url, page_title, visit_time)
                    VALUES (?, ?, ?, ?, ?)''',
                  (user['id'], session_id, '/dashboard', 'Dashboard', current_time))
+        self.create_tracking_event(session_id, 'page_view', '/dashboard', 'Dashboard', current_time)
         current_time += timedelta(seconds=random.randint(5, 30))
         
         # Perform searches and visit topics
@@ -224,6 +296,7 @@ class SessionSimulator:
             c.execute('''INSERT INTO page_visits (user_id, session_id, page_url, page_title, visit_time)
                        VALUES (?, ?, ?, ?, ?)''',
                      (user['id'], session_id, search_url, f'Search: {query}', current_time))
+            self.create_tracking_event(session_id, 'search', search_url, f'Search: {query}', current_time, query=query)
             
             c.execute('''INSERT INTO search_queries (user_id, session_id, query_term, search_time)
                        VALUES (?, ?, ?, ?)''',
@@ -237,6 +310,7 @@ class SessionSimulator:
                 c.execute('''INSERT INTO page_visits (user_id, session_id, page_url, page_title, visit_time)
                            VALUES (?, ?, ?, ?, ?)''',
                          (user['id'], session_id, topic_url, f'Topic: {topic}', current_time))
+                self.create_tracking_event(session_id, 'page_view', topic_url, f'Topic: {topic}', current_time)
                 current_time += timedelta(seconds=random.randint(20, 120))
         
         # Logout

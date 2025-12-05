@@ -156,7 +156,7 @@ class MembershipInferenceAttack:
     
     def prepare_dataset(self):
         """Prepare training dataset from portal and tracker databases"""
-        print("📊 Preparing dataset for membership inference attack...")
+        print("[STATS] Preparing dataset for membership inference attack...")
         
         portal_conn = sqlite3.connect(self.portal_db)
         tracker_conn = sqlite3.connect(self.tracker_db)
@@ -209,15 +209,18 @@ class MembershipInferenceAttack:
         X = np.array(X)
         y = np.array(y)
         
-        print(f"✓ Dataset prepared: {len(X)} sessions")
-        print(f"  - Sensitive sessions: {np.sum(y)} ({np.sum(y)/len(y)*100:.1f}%)")
-        print(f"  - Non-sensitive sessions: {len(y) - np.sum(y)} ({(len(y)-np.sum(y))/len(y)*100:.1f}%)")
+        print(f"[OK] Dataset prepared: {len(X)} sessions")
+        if len(y) > 0:
+            print(f"  - Sensitive sessions: {np.sum(y)} ({np.sum(y)/len(y)*100:.1f}%)")
+            print(f"  - Non-sensitive sessions: {len(y) - np.sum(y)} ({(len(y)-np.sum(y))/len(y)*100:.1f}%)")
+        else:
+            print("  - No sessions with tracking data found")
         
         return X, y, valid_sessions
     
     def train_attack_model(self, X, y):
         """Train membership inference attack model"""
-        print("\n🎯 Training membership inference attack model...")
+        print("\n[TRAIN] Training membership inference attack model...")
         
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
@@ -246,7 +249,7 @@ class MembershipInferenceAttack:
         train_accuracy = accuracy_score(y_train, y_pred_train)
         test_accuracy = accuracy_score(y_test, y_pred_test)
         
-        print(f"\n📈 Model Performance:")
+        print(f"\n[RESULTS] Model Performance:")
         print(f"  Training accuracy: {train_accuracy*100:.2f}%")
         print(f"  Test accuracy: {test_accuracy*100:.2f}%")
         
@@ -329,21 +332,21 @@ class MembershipInferenceAttack:
     def run_attack(self):
         """Run complete membership inference attack"""
         print("=" * 70)
-        print("🔓 MEMBERSHIP INFERENCE ATTACK")
+        print("MEMBERSHIP INFERENCE ATTACK")
         print("=" * 70)
         
         # Prepare dataset
         X, y, sessions = self.prepare_dataset()
         
         if len(X) == 0:
-            print("❌ No data available. Please run simulate_sessions.py first.")
+            print("[ERROR] No data available. Please run simulate_sessions.py first.")
             return
         
         # Train model
         results = self.train_attack_model(X, y)
         
         print("\n" + "=" * 70)
-        print("✅ Attack complete!")
+        print("[SUCCESS] Attack complete!")
         print(f"   Attack success rate: {results['test_accuracy']*100:.2f}%")
         print("=" * 70)
         
