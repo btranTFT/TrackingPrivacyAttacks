@@ -214,7 +214,47 @@ class SessionSimulator:
         """Generate random session ID"""
         return f"session_{random.randint(100000, 999999)}_{int(time.time())}"
     
-    def create_tracking_event(self, session_id, event_type, page_url, page_title, timestamp, query=None):
+    def detect_sensitive_leakage(self, page_url, page_title, query=None):
+        """Detect if tracking event contains sensitive information"""
+        # Sensitive terms that indicate potential privacy leakage
+        SENSITIVE_TERMS = [
+            'oncology', 'cancer', 'chemotherapy',
+            'hiv', 'aids',
+            'mental health', 'depression', 'anxiety', 'psychiatric',
+            'abortion', 'pregnancy',
+            'addiction', 'substance abuse',
+            'std', 'sexually transmitted',
+            'erectile dysfunction',
+            'fertility'
+        ]
+        
+        # Check all text fields
+        text_to_check = f"{page_url} {page_title}".lower()
+        if query:
+            text_to_check += f" {query}".lower()
+        
+        detected_terms = []
+        for term in SENSITIVE_TERMS:
+            if term.lower() in text_to_check:
+                detected_terms.append(term)
+        
+        if not detected_terms:
+            return None, None
+        
+        # Determine leak type
+        leak_types = []
+        if '?' in page_url:
+            leak_types.append('url_parameter')
+        if page_title:
+            leak_types.append('page_title')
+        if query:
+            leak_types.append('search_query')
+        
+        leak_type = ','.join(leak_types) if leak_types else 'other'
+        
+        return detected_terms, leak_type
+    
+    def create_tracking_event(self, session_id, event_type, page_url, page_title, timestamp, query=None, has_sensitive=False):
         """Create a tracking event in the tracker database"""
         tracker_conn = sqlite3.connect(self.tracker_db_path)
         tracker_c = tracker_conn.cursor()
@@ -240,6 +280,42 @@ class SessionSimulator:
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                          (tracker_id, session_id, timestamp.isoformat(), event_type, page_url, page_title,
                           '', 'Mozilla/5.0 (simulated)', '1920x1080', json.dumps(event_data)))
+        
+        # Check for sensitive leakage and populate leakage_analysis table
+        # Always check for leakage, not just when has_sensitive flag is set
+        sensitive_terms, leak_type = self.detect_sensitive_leakage(page_url, page_title, query)
+        if sensitive_terms:
+            # Check if this session already has a leakage record
+            tracker_c.execute('''SELECT id, sensitive_terms, leak_type FROM leakage_analysis WHERE session_id = ?''', (session_id,))
+            existing = tracker_c.fetchone()
+            
+            if existing:
+                # Update existing record - merge sensitive terms
+                try:
+                    existing_terms = json.loads(existing[1])
+                    if isinstance(existing_terms, list):
+                        all_terms = list(set(existing_terms + sensitive_terms))
+                    else:
+                        all_terms = sensitive_terms
+                except:
+                    all_terms = sensitive_terms
+                
+                # Merge leak types
+                existing_types = existing[2] or ''
+                all_types = ','.join(set((existing_types.split(',') if existing_types else []) + (leak_type.split(',') if leak_type else [])))
+                
+                tracker_c.execute('''UPDATE leakage_analysis 
+                                   SET has_sensitive_leak = 1, 
+                                       sensitive_terms = ?,
+                                       leak_type = ?
+                                   WHERE session_id = ?''',
+                                 (json.dumps(all_terms), all_types, session_id))
+            else:
+                # Insert new record
+                tracker_c.execute('''INSERT INTO leakage_analysis 
+                                   (session_id, has_sensitive_leak, sensitive_terms, leak_type)
+                                   VALUES (?, ?, ?, ?)''',
+                                 (session_id, 1, json.dumps(sensitive_terms), leak_type))
         
         tracker_conn.commit()
         tracker_conn.close()
@@ -275,7 +351,7 @@ class SessionSimulator:
         c.execute('''INSERT INTO page_visits (user_id, session_id, page_url, page_title, visit_time)
                    VALUES (?, ?, ?, ?, ?)''',
                  (user['id'], session_id, '/dashboard', 'Dashboard', current_time))
-        self.create_tracking_event(session_id, 'page_view', '/dashboard', 'Dashboard', current_time)
+        self.create_tracking_event(session_id, 'page_view', '/dashboard', 'Dashboard', current_time, has_sensitive=False)
         current_time += timedelta(seconds=random.randint(5, 30))
         
         # Perform searches and visit topics
@@ -284,19 +360,22 @@ class SessionSimulator:
                 # Visit sensitive topics
                 query = random.choice(SEARCH_QUERIES['sensitive'])
                 topic = random.choice(HEALTH_TOPICS['sensitive'])
+                is_sensitive = True
             elif random.random() < 0.3:
                 query = random.choice(SEARCH_QUERIES['moderate'])
                 topic = random.choice(HEALTH_TOPICS['moderate'])
+                is_sensitive = False
             else:
                 query = random.choice(SEARCH_QUERIES['general'])
                 topic = random.choice(HEALTH_TOPICS['general'])
+                is_sensitive = False
             
             # Search
             search_url = f'/search?q={query}'
             c.execute('''INSERT INTO page_visits (user_id, session_id, page_url, page_title, visit_time)
                        VALUES (?, ?, ?, ?, ?)''',
                      (user['id'], session_id, search_url, f'Search: {query}', current_time))
-            self.create_tracking_event(session_id, 'search', search_url, f'Search: {query}', current_time, query=query)
+            self.create_tracking_event(session_id, 'search', search_url, f'Search: {query}', current_time, query=query, has_sensitive=is_sensitive)
             
             c.execute('''INSERT INTO search_queries (user_id, session_id, query_term, search_time)
                        VALUES (?, ?, ?, ?)''',
@@ -310,7 +389,7 @@ class SessionSimulator:
                 c.execute('''INSERT INTO page_visits (user_id, session_id, page_url, page_title, visit_time)
                            VALUES (?, ?, ?, ?, ?)''',
                          (user['id'], session_id, topic_url, f'Topic: {topic}', current_time))
-                self.create_tracking_event(session_id, 'page_view', topic_url, f'Topic: {topic}', current_time)
+                self.create_tracking_event(session_id, 'page_view', topic_url, f'Topic: {topic}', current_time, has_sensitive=is_sensitive)
                 current_time += timedelta(seconds=random.randint(20, 120))
         
         # Logout
