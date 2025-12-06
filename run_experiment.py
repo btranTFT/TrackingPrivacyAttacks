@@ -29,18 +29,18 @@ def check_dependencies():
         import flask
         import numpy
         import sklearn
-        print("✓ Python dependencies installed")
+        print("[OK] Python dependencies installed")
     except ImportError as e:
-        print(f"❌ Missing Python dependency: {e}")
+        print(f"[ERROR] Missing Python dependency: {e}")
         print("Run: pip install -r requirements.txt")
         return False
     
     # Check Node.js
     try:
         result = subprocess.run(['node', '--version'], capture_output=True, text=True)
-        print(f"✓ Node.js installed: {result.stdout.strip()}")
+        print(f"[OK] Node.js installed: {result.stdout.strip()}")
     except FileNotFoundError:
-        print("❌ Node.js not found. Please install Node.js")
+        print("[ERROR] Node.js not found. Please install Node.js")
         return False
     
     return True
@@ -52,7 +52,7 @@ def run_simulation():
     print("Team: Nicholas Ramirez-Ornelas, Kai Xue, Benjamin Tran, Andrew Tarng\n")
     
     if not check_dependencies():
-        print("\n❌ Please install missing dependencies first")
+        print("\n[ERROR] Please install missing dependencies first")
         return
     
     # Step 1: Generate synthetic sessions
@@ -62,9 +62,9 @@ def run_simulation():
     
     try:
         subprocess.run([sys.executable, 'simulate_sessions.py'], check=True)
-        print("\n✓ Session generation complete")
+        print("\n[OK] Session generation complete")
     except subprocess.CalledProcessError as e:
-        print(f"\n❌ Error generating sessions: {e}")
+        print(f"\n[ERROR] Error generating sessions: {e}")
         return
     
     time.sleep(2)
@@ -76,9 +76,9 @@ def run_simulation():
     
     try:
         subprocess.run([sys.executable, 'membership_inference_attack.py'], check=True)
-        print("\n✓ Attack evaluation complete")
+        print("\n[OK] Attack evaluation complete")
     except subprocess.CalledProcessError as e:
-        print(f"\n❌ Error running attack: {e}")
+        print(f"\n[ERROR] Error running attack: {e}")
         return
     
     time.sleep(2)
@@ -89,9 +89,9 @@ def run_simulation():
     
     try:
         subprocess.run([sys.executable, 'privacy_defenses.py'], check=True)
-        print("\n✓ Defense testing complete")
+        print("\n[OK] Defense testing complete")
     except subprocess.CalledProcessError as e:
-        print(f"\n❌ Error testing defenses: {e}")
+        print(f"\n[ERROR] Error testing defenses: {e}")
     
     time.sleep(2)
     
@@ -102,9 +102,9 @@ def run_simulation():
     
     try:
         subprocess.run([sys.executable, 'differential_privacy.py'], check=True)
-        print("\n✓ Differential privacy testing complete")
+        print("\n[OK] Differential privacy testing complete")
     except subprocess.CalledProcessError as e:
-        print(f"\n❌ Error testing DP: {e}")
+        print(f"\n[ERROR] Error testing DP: {e}")
     
     time.sleep(2)
     
@@ -114,13 +114,13 @@ def run_simulation():
     
     try:
         subprocess.run([sys.executable, 'analyze_results.py'], check=True)
-        print("\n✓ Analysis complete")
+        print("\n[OK] Analysis complete")
     except subprocess.CalledProcessError as e:
-        print(f"\n❌ Error running analysis: {e}")
+        print(f"\n[ERROR] Error running analysis: {e}")
     
     # Final summary
     print_header("EXPERIMENT COMPLETE")
-    print("✅ All components have been executed successfully!\n")
+    print("[SUCCESS] All components have been executed successfully!\n")
     print("Generated Files:")
     print("  - healthcare_portal.db (portal data)")
     print("  - tracker_data.db (tracking events)")
