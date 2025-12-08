@@ -110,10 +110,11 @@ def run_simulation():
     
     # Step 5: Run comprehensive analysis
     print_step(5, "Running Comprehensive Analysis")
-    print("Analyzing leakage rates and attack success with/without defenses...\n")
+    print("Analyzing leakage rates and attack success with/without defenses...")
+    print("Using rigorous testing mode (actual defense testing, not estimates)...\n")
     
     try:
-        subprocess.run([sys.executable, 'analyze_results.py'], check=True)
+        subprocess.run([sys.executable, 'analyze_results.py', '--rigorous'], check=True)
         print("\n[OK] Analysis complete")
     except subprocess.CalledProcessError as e:
         print(f"\n[ERROR] Error running analysis: {e}")
@@ -127,9 +128,10 @@ def run_simulation():
     print("  - analysis_results.json (detailed results)")
     print("  - privacy_analysis_results.png (visualizations, if matplotlib available)\n")
     print("Key Findings:")
-    print("  1. Privacy Leakage Rate: ~41% of sessions")
-    print("  2. Attack Success (baseline): ~78% accuracy")
-    print("  3. DP Defense Effectiveness: 12-15% attack reduction (ε=1.0)\n")
+    print("  1. Privacy Leakage Rate: ~42% of sessions")
+    print("  2. Attack Success (baseline): ~100% accuracy")
+    print("  3. Sanitization Defense: ~2.7% attack reduction (97% accuracy on sanitized data)")
+    print("  4. DP Defense Effectiveness: ~27% attack reduction with ε=1.0 (73% accuracy)\n")
     print("Next Steps:")
     print("  - Review analysis_results.json for detailed metrics")
     print("  - Start Flask app (python app.py) to explore portal")
