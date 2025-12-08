@@ -25,7 +25,7 @@ class LeakageAnalyzer:
         """
         Calculate the percentage of sessions with sensitive data leakage
         """
-        print("📊 Calculating Leakage Rate...")
+        print("[STATS] Calculating Leakage Rate...")
         print("=" * 70)
         
         conn = sqlite3.connect(self.tracker_db)
@@ -71,7 +71,7 @@ class LeakageAnalyzer:
     
     def analyze_sensitive_terms(self):
         """Analyze which sensitive terms are most commonly leaked"""
-        print("\n🔍 Analyzing Sensitive Terms...")
+        print("\n[ANALYZE] Analyzing Sensitive Terms...")
         print("=" * 70)
         
         conn = sqlite3.connect(self.tracker_db)
@@ -107,7 +107,7 @@ class LeakageAnalyzer:
     
     def compare_with_without_defenses(self):
         """Compare leakage with and without privacy defenses"""
-        print("\n🛡️  Comparing Leakage: With vs Without Defenses")
+        print("\n[DEFENSE] Comparing Leakage: With vs Without Defenses")
         print("=" * 70)
         
         # Get baseline leakage (without defenses)
@@ -173,7 +173,7 @@ class AttackSuccessAnalyzer:
     
     def evaluate_baseline_attack(self):
         """Evaluate attack success without any defenses"""
-        print("\n🎯 Evaluating Baseline Attack (No Defenses)")
+        print("\n[ATTACK] Evaluating Baseline Attack (No Defenses)")
         print("=" * 70)
         
         results = self.attack.run_attack()
@@ -182,7 +182,7 @@ class AttackSuccessAnalyzer:
     
     def evaluate_attack_with_dp(self, epsilon=1.0):
         """Evaluate attack success with differential privacy"""
-        print(f"\n🛡️  Evaluating Attack with Differential Privacy (ε={epsilon})")
+        print(f"\n[DP] Evaluating Attack with Differential Privacy (ε={epsilon})")
         print("=" * 70)
         
         # Apply DP noise to tracker data
@@ -221,7 +221,7 @@ class AttackSuccessAnalyzer:
     
     def compare_defense_effectiveness(self):
         """Compare effectiveness of different defense mechanisms"""
-        print("\n📊 Defense Mechanism Comparison")
+        print("\n[COMPARE] Defense Mechanism Comparison")
         print("=" * 70)
         
         results = {}
@@ -248,14 +248,17 @@ class AttackSuccessAnalyzer:
 class ComprehensiveAnalysis:
     """Run comprehensive analysis of the entire system"""
     
-    def __init__(self):
+    def __init__(self, rigorous_mode=False):
         self.leakage_analyzer = LeakageAnalyzer()
         self.attack_analyzer = AttackSuccessAnalyzer()
+        self.rigorous_mode = rigorous_mode
     
     def run_full_analysis(self):
         """Run complete analysis pipeline"""
         print("\n" + "=" * 70)
         print("COMPREHENSIVE PRIVACY ANALYSIS")
+        if self.rigorous_mode:
+            print("*** RIGOROUS MODE: Actual defense testing ***")
         print("Tracking the Trackers: Privacy Attacks and Defenses")
         print("=" * 70)
         
@@ -285,8 +288,34 @@ class ComprehensiveAnalysis:
         
         try:
             results['attack_analysis']['baseline'] = self.attack_analyzer.evaluate_baseline_attack()
-            results['attack_analysis']['with_dp'] = self.attack_analyzer.evaluate_attack_with_dp(epsilon=1.0)
-            results['attack_analysis']['comparison'] = self.attack_analyzer.compare_defense_effectiveness()
+            
+            if self.rigorous_mode:
+                # Use rigorous testing (actually applies defenses and retests)
+                print("\n[RIGOROUS] Running actual sanitization and DP tests...")
+                try:
+                    from test_sanitization_attack import SanitizationAttackTest
+                    from test_dp_attack import DPAttackTest
+                    
+                    # Test sanitization
+                    print("\n[RIGOROUS] Testing sanitization...")
+                    san_tester = SanitizationAttackTest()
+                    results['attack_analysis']['sanitization_rigorous'] = san_tester.run_comparison()
+                    
+                    # Test DP
+                    print("\n[RIGOROUS] Testing differential privacy...")
+                    dp_tester = DPAttackTest()
+                    results['attack_analysis']['dp_rigorous'] = dp_tester.run_comparison(epsilons=[0.5, 1.0, 2.0])
+                    
+                except ImportError as ie:
+                    print(f"[WARNING] Rigorous test modules not found: {ie}")
+                    print("Falling back to estimation-based testing...")
+                    results['attack_analysis']['with_dp'] = self.attack_analyzer.evaluate_attack_with_dp(epsilon=1.0)
+                    results['attack_analysis']['comparison'] = self.attack_analyzer.compare_defense_effectiveness()
+            else:
+                # Use original estimation-based testing
+                results['attack_analysis']['with_dp'] = self.attack_analyzer.evaluate_attack_with_dp(epsilon=1.0)
+                results['attack_analysis']['comparison'] = self.attack_analyzer.compare_defense_effectiveness()
+                
         except Exception as e:
             print(f"Note: {e}")
             print("Make sure to run simulate_sessions.py first to generate data.")
@@ -305,7 +334,7 @@ class ComprehensiveAnalysis:
         print("SUMMARY REPORT")
         print("=" * 70)
         
-        print("\n📊 Key Findings:")
+        print("\n[FINDINGS] Key Findings:")
         print("-" * 70)
         
         # Leakage findings
@@ -329,7 +358,7 @@ class ComprehensiveAnalysis:
             print(f"   - New attack accuracy: {dp_result['dp_accuracy']*100:.1f}%")
         
         print("\n" + "=" * 70)
-        print("✅ Analysis Complete!")
+        print("[SUCCESS] Analysis Complete!")
         print("=" * 70)
     
     def save_results(self, results, filename='analysis_results.json'):
@@ -353,11 +382,11 @@ class ComprehensiveAnalysis:
         with open(filename, 'w') as f:
             json.dump(results_serializable, f, indent=2)
         
-        print(f"\n💾 Results saved to {filename}")
+        print(f"\n[SAVED] Results saved to {filename}")
     
     def generate_visualizations(self):
         """Generate visualization plots"""
-        print("\n📈 Generating visualizations...")
+        print("\n[VISUALIZE] Generating visualizations...")
         
         try:
             # Leakage rate comparison
@@ -390,8 +419,15 @@ class ComprehensiveAnalysis:
 
 
 if __name__ == '__main__':
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Analyze privacy leakage and attacks')
+    parser.add_argument('--rigorous', action='store_true',
+                       help='Use rigorous testing (actually apply defenses and retest)')
+    args = parser.parse_args()
+    
     # Run comprehensive analysis
-    analyzer = ComprehensiveAnalysis()
+    analyzer = ComprehensiveAnalysis(rigorous_mode=args.rigorous)
     results = analyzer.run_full_analysis()
     
     # Generate visualizations
